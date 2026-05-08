@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config>
+        <trust-anchors>
+            <!-- Trust the system CAs -->
+            <certificates src="system"/>
+            <!-- Trust the corporate Zscaler Root CA (SSL inspection proxy) -->
+            <certificates src="@raw/zscaler_root_ca"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>

@@ -1,0 +1,41 @@
+parameters:
+  applicationEnvironment: '' # e.g. "Staging", "Production"
+  deploymentEnvironment: '' # e.g. "GooglePlay", "AppStore", "Firebase App Distribution"
+
+jobs:
+- deployment:  GooglePlay_Android
+
+  pool:
+    vmImage: $(windowsHostedAgentImage)
+
+  environment: ${{ parameters.deploymentEnvironment }}
+
+  variables:
+  - group: FlutterApplicationTemplate.Distribution.GooglePlay
+  - name: artifactName
+    value: $(AndroidArtifactName)_${{ parameters.applicationEnvironment }}
+
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - download: current
+          artifact: $(artifactName)
+
+        - task: GooglePlayRelease@4
+          displayName: 'Release AAB'
+          inputs:
+            serviceConnection: $(GooglePlayServiceConnection)
+            applicationId: '$(ApplicationIdentifier)'
+            action: 'SingleBundle'
+            bundleFile: '$(Pipeline.Workspace)/$(artifactName)/app-release.aab'
+            track: 'internal'
+            changesNotSentForReview: true
+
+        - task: DeleteFiles@1
+          displayName: "Remove Downloaded Artifacts"
+          condition: always()
+          inputs:
+            SourceFolder: $(Pipeline.Workspace)/$(artifactName)
+            RemoveSourceFolder: true
+            Contents: '**'

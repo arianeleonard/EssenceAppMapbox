@@ -1,0 +1,42 @@
+parameters:
+- name: pathToSrc
+  type: string
+  default: ''
+- name: projectName
+  type: string
+  default: '$(ProjectName)'
+
+steps:
+- template: templates/gitversion.yml
+- template: templates/build-number.yml
+- template: templates/flutter-install.yml
+
+
+
+- template: templates/flutter-prepare.yml
+  parameters:
+    projectDirectory: '${{ parameters.pathToSrc }}/app'
+
+- task: FlutterBuild@0
+  displayName: 'Build solution in $(ApplicationConfiguration)'
+  inputs:
+    target: windows
+    buildName: '$(MajorMinorPatch)'
+    buildNumber: '$(BuildNumber)'
+    projectDirectory: '${{ parameters.pathToSrc }}/app'
+    verboseMode: true
+    dartDefine: ENV=$(applicationEnvironment)
+
+- template: templates/flutter-diagnostics.yml
+  parameters:
+    projectDirectory: '${{ parameters.pathToSrc }}/app'
+    condition: failed()
+
+- publish: $(Build.ArtifactStagingDirectory)
+  displayName: 'Publish artifact $(ApplicationConfiguration)'
+  condition: always()
+  artifact: $(ArtifactName)
+
+- task: PostBuildCleanup@4
+  displayName: 'Post-Build Cleanup: Cleanup files to keep build server clean!'
+  condition: always()

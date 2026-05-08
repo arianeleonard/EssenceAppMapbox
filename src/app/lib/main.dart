@@ -1,0 +1,239 @@
+import 'dart:io';
+
+import 'package:alice/alice.dart';
+import 'package:alice/model/alice_configuration.dart';
+import 'package:alice_dio/alice_dio_adapter.dart';
+import 'package:app/access/bugsee/bugsee_repository.dart';
+import 'package:app/access/diagnostics/diagnostics_repository.dart';
+import 'package:app/access/environment/environment_repository.dart';
+import 'package:app/access/firebase/firebase_repository.dart';
+import 'package:app/access/forced_update/current_version_repository.dart';
+import 'package:app/access/forced_update/minimum_version_repository.dart';
+import 'package:app/access/forced_update/minimum_version_repository_mock.dart';
+import 'package:app/access/kill_switch/kill_switch_repository.dart';
+import 'package:app/access/kill_switch/kill_switch_repository_mock.dart';
+import 'package:app/access/logger/logger_repository.dart';
+import 'package:app/access/mocking/mocking_repository.dart';
+import 'package:app/access/stations/stations_mocked_repository.dart';
+import 'package:app/access/stations/stations_repository.dart';
+import 'package:app/app.dart';
+import 'package:app/app_router.dart';
+import 'package:app/business/bugsee/bugsee_manager.dart';
+import 'package:app/business/diagnostics/diagnostics_service.dart';
+import 'package:app/business/environment/environment.dart';
+import 'package:app/business/environment/environment_manager.dart';
+import 'package:app/business/forced_update/update_required_service.dart';
+import 'package:app/business/kill_switch/kill_switch_service.dart';
+import 'package:app/business/logger/logger_manager.dart';
+import 'package:app/business/mocking/mocking_manager.dart';
+import 'package:app/business/stations/stations_service.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:dio/io.dart';
+
+late Logger _logger;
+
+Future<void> main() async {
+  await initializeComponents();
+  runApp(const App());
+}
+
+Future initializeComponents({bool? isMocked}) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await _registerAndLoadEnvironment();
+  await _registerAndLoadLoggers();
+  await _registerBugseeManager();
+
+  _logger.d("Initialized environment and logger.");
+
+  MapboxOptions.setAccessToken(dotenv.env['MAPBOX_ACCESS_TOKEN']!);
+
+  _registerHttpClient();
+  _logger.i("HttpClient has been initialized and registered in the container.");
+
+  await _registerRepositories(isMocked);
+  _logger.i(
+    "Repositories have been initialized and registered in the container.",
+  );
+
+  _registerServices();
+  _logger.i("Services have been initialized and registered in the container.");
+
+  GetIt.I.get<UpdateRequiredService>().waitForUpdateRequired().then((value) {
+    _logger.d("Force update is now required.");
+    router.go(forcedUpdatePagePath);
+    _logger.i("Navigated to forced update page.");
+  });
+
+  GetIt.I.get<KillSwitchService>().isKillSwitchActivatedStream().listen((
+    isActivated,
+  ) {
+    _logger.d("KillSwitch state has been changed.");
+    if (isActivated && currentPath != forcedUpdatePagePath) {
+      router.go(killSwitchPagePath);
+      _logger.i("KillSwitch is activated. Navigated to kill switch page.");
+    } else if (!isActivated && currentPath == killSwitchPagePath) {
+      router.go(home);
+      _logger.i("Killswitch is deactivated. Navigated to home page.");
+    }
+  });
+}
+
+Future _registerAndLoadEnvironment() async {
+  // Register environment services in the IoC.
+  GetIt.I.registerSingleton(EnvironmentRepository());
+  GetIt.I.registerSingleton(
+    EnvironmentManager(GetIt.I.get<EnvironmentRepository>()),
+  );
+
+  await GetIt.I.get<EnvironmentManager>().setEnvironment(
+    Environment.development,
+  );
+
+  // Loads the current environment.
+  await GetIt.I.get<EnvironmentManager>().load(
+    const String.fromEnvironment('ENV'),
+  );
+}
+
+Future _registerAndLoadLoggers() async {
+  // Register logging services in the IoC.
+  GetIt.I.registerSingleton(LoggerRepository());
+  GetIt.I.registerSingleton(
+    Alice(
+      configuration: AliceConfiguration(
+        showNotification: false,
+        navigatorKey: rootNavigatorKey,
+      ),
+    ),
+  );
+  GetIt.I.registerSingleton(
+    LoggerManager(
+      loggerRepository: GetIt.I.get<LoggerRepository>(),
+      alice: GetIt.I.get<Alice>(),
+    ),
+  );
+
+  // Create a new instance of logger and insert it into the IoC.
+  _logger = await GetIt.I.get<LoggerManager>().createLogInstance();
+  GetIt.I.registerSingleton(_logger);
+}
+
+Future _registerBugseeManager() async {
+  GetIt.I.registerSingleton<BugseeRepository>(BugseeRepository());
+  GetIt.I.registerSingleton<BugseeManager>(
+    BugseeManager(
+      logger: GetIt.I.get<Logger>(),
+      bugseeRepository: GetIt.I.get<BugseeRepository>(),
+    ),
+  );
+  GetIt.I.get<BugseeManager>().initialize(
+    bugseeToken: const String.fromEnvironment('BUGSEE_TOKEN'),
+  );
+}
+
+/// Registers the HTTP client.
+void _registerHttpClient() {
+  final dio = Dio();
+
+  // Dart's SSL stack does not read Android's Network Security Config.
+  // On corporate networks using Zscaler SSL inspection, certificates are
+  // re-signed by the Zscaler CA. Trust them explicitly.
+  if (!kIsWeb) {
+    (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient();
+      // Disable auto-decompression so ResponseType.bytes always delivers
+      // raw bytes. Required when fetching pre-compressed files like .gz.
+      client.autoUncompress = false;
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+            return cert.issuer.contains('Zscaler') ||
+                cert.subject.contains('Zscaler');
+          };
+      return client;
+    };
+  }
+
+  final AliceDioAdapter aliceDioAdapter = AliceDioAdapter();
+  GetIt.I.get<Alice>().addAdapter(aliceDioAdapter);
+  dio.interceptors.add(aliceDioAdapter);
+
+  GetIt.I.registerSingleton<Dio>(dio);
+}
+
+/// Registers the repositories.
+Future<void> _registerRepositories(bool? isMocked) async {
+  var mockingRepo = GetIt.I.registerSingleton(MockingRepository());
+
+  // If the mocking state is not provided, we will check the current state.
+  isMocked ??= await mockingRepo.isMockingEnabled();
+
+  if (isMocked) {
+    GetIt.I.get<MockingRepository>().setMocking(isMocked);
+    GetIt.I.registerSingleton<StationsRepository>(StationsMockedRepository());
+  } else {
+    GetIt.I.registerSingleton<StationsRepository>(
+      StationsRepository(
+        GetIt.I.get<Dio>(),
+        baseUrl: dotenv.env["STATIONS_BASE_URL"]!,
+      ),
+    );
+  }
+
+  GetIt.I.registerSingleton(
+    DiagnosticsRepository(
+      bool.parse(dotenv.env["DIAGNOSTIC_ENABLED"] ?? 'false'),
+    ),
+  );
+  GetIt.I
+      .registerSingleton(MockingManager(GetIt.I.get<MockingRepository>()))
+      .initialize();
+
+  /// Firebase remote config is either not supported on desktop platforms or in beta.
+  if (Platform.isMacOS || Platform.isWindows || Platform.isLinux || isMocked) {
+    GetIt.I.registerSingleton<MinimumVersionRepository>(
+      MinimumVersionRepositoryMock(),
+    );
+    GetIt.I.registerSingleton<KillSwitchRepository>(KillSwitchRepositoryMock());
+  } else {
+    var fireBaseRemoteConfigRepository = FirebaseRemoteConfigRepository(
+      _logger,
+    );
+
+    GetIt.I.registerSingleton<MinimumVersionRepository>(
+      fireBaseRemoteConfigRepository,
+    );
+    GetIt.I.registerSingleton<KillSwitchRepository>(
+      fireBaseRemoteConfigRepository,
+    );
+  }
+
+  GetIt.I.registerSingleton(CurrentVersionRepository());
+}
+
+/// Registers the services.
+void _registerServices() {
+  GetIt.I.registerSingleton<StationsService>(
+    StationsService(GetIt.I.get<StationsRepository>(), _logger),
+  );
+
+  GetIt.I.registerSingleton(
+    DiagnosticsService(GetIt.I.get<DiagnosticsRepository>()),
+  );
+
+  GetIt.I.registerSingleton(
+    UpdateRequiredService(
+      GetIt.I.get<MinimumVersionRepository>(),
+      GetIt.I.get<CurrentVersionRepository>(),
+    ),
+  );
+
+  GetIt.I.registerSingleton(
+    KillSwitchService(GetIt.I.get<KillSwitchRepository>()),
+  );
+}

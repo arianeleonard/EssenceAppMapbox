@@ -1,0 +1,13 @@
+parameters:
+- name: projectDirectory
+  type: string
+  default: '$(Build.SourcesDirectory)/src/app'
+
+steps:
+  - task: FlutterInstall@0
+    displayName: 'Run Flutter Install'
+    inputs:
+      mode: 'auto'
+      channel: 'stable'
+      version: 'custom'
+      customVersion : $(FlutterVersion)

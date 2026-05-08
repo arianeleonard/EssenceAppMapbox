@@ -1,0 +1,154 @@
+parameters:
+- name: applicationEnvironment
+  type: string
+  default: ''
+- name: artifactName
+  type: string
+  default: $(TestsArtifactName)_$(applicationEnvironment)
+- name: androidArtifactName
+  type: string
+  default: $(AndroidArtifactName)_$(applicationEnvironment)
+- name: iosArtifactName
+  type: string
+  default: $(iOSArtifactName)_$(applicationEnvironment)
+- name: androidKeyStoreFile
+  type: string
+  default: ''
+- name: androidKeyPropertiesFile
+  type: string
+  default: ''
+- name: androidVariableGroup
+  type: string
+  default: ''
+- name: iosCertificateFile
+  type: string
+  default: ''
+- name: iosProvisioningProfileFile
+  type: string
+  default: ''
+- name: iosExportOptionsFile
+  type: string
+  default: ''
+- name: iosCertificatePassword
+  type: string
+  default: ''
+- name: iosVariableGroup
+  type: string
+  default: ''
+- name: removeHyperlinksFromReleaseNotes
+  type: boolean
+  default: false
+- name: releaseNotesArtifactName
+  type: string
+  default: $(ReleaseNotesArtifactName)_$(applicationEnvironment)
+- name: pathToSrc
+  type: string
+  default: '$(Build.SourcesDirectory)/src'
+- name: projectName
+  type: string
+  default: ''
+- name: BannerVersionNameText
+  type: string
+  default: ''
+- name: firebaseJsonFile
+  type: string
+- name: firebaseOptionsDartFile
+  type: string
+- name: googleServicesJsonFile
+  type: string
+- name: bugseeVariableGroup
+  type: string
+  default: ''
+- name: androidArtifactFormat
+  type: string
+  default: 'aab'
+
+jobs:
+  - job: OnWindows_ReleaseNotes
+    pool:
+      vmImage : $(windowsHostedAgentImage)
+    variables:
+      ArtifactName: ${{ parameters.releaseNotesArtifactName }}
+      ApplicationEnvironment: ${{ parameters.applicationEnvironment }}
+    steps:
+      - template: steps-build-release-notes.yml
+        parameters:
+          removeHyperlinksFromReleaseNotes: ${{ parameters.removeHyperlinksFromReleaseNotes }}
+
+  - job: OnWindows_Windows
+    pool:
+      vmImage : $(windowsHostedAgentImage)
+    variables:
+    - name: ApplicationConfiguration
+      value: Release
+    - name: ArtifactName
+      value: $(WindowsArtifactName)_${{ parameters.applicationEnvironment }}
+    - name: ApplicationEnvironment
+      value: ${{ parameters.applicationEnvironment }}
+
+    steps:
+      - template: steps-build-windows.yml
+        parameters:
+          pathToSrc: ${{ parameters.pathToSrc }}
+          projectName: ${{ parameters.projectName }}
+
+  - job: OnWindows_Tests
+    pool:
+      vmImage : $(windowsHostedAgentImage)
+    variables:
+      ArtifactName: ${{ parameters.artifactName }}
+      ApplicationEnvironment: ${{ parameters.applicationEnvironment }}
+    steps:
+      - template: steps-build-tests.yml
+        parameters:
+          pathToSrc: ${{ parameters.pathToSrc }}
+          projectName: ${{ parameters.projectName }}
+          applicationEnvironment: ${{ parameters.applicationEnvironment }}
+
+  - job: OnWindows_Android
+    pool:
+      vmImage : $(windowsHostedAgentImage)
+    variables:
+    - name: ApplicationEnvironment
+      value: ${{ parameters.applicationEnvironment }}
+    - name: ArtifactName
+      value: ${{ parameters.androidArtifactName }}
+
+    - group: ${{ parameters.androidVariableGroup }}
+
+    steps:
+    - template: steps-build-android.yml
+      parameters:
+        pathToSrc: ${{ parameters.pathToSrc }}
+        projectName: ${{ parameters.projectName }}
+        androidKeystoreFile: ${{ parameters.androidKeyStoreFile }}
+        androidKeyStorePropertiesFile: ${{ parameters.androidKeyPropertiesFile }}
+        firebaseJsonFile: '${{ parameters.firebaseJsonFile }}'
+        firebaseOptionsDartFile: '${{ parameters.firebaseOptionsDartFile }}'
+        googleServicesJsonFile: '${{ parameters.googleServicesJsonFile }}'
+        artifactTargetFormat: '${{ parameters.androidArtifactFormat }}'
+
+  - job: OnMac_iOS
+    pool:
+      vmImage: $(macOSHostedAgentImage)
+    variables:
+    - name: ApplicationEnvironment
+      value: ${{ parameters.applicationEnvironment }}
+    - name: ArtifactName
+      value: ${{ parameters.iosArtifactName }}
+
+    - group: ${{ parameters.iosVariableGroup }}
+
+    steps:
+    - template: steps-build-ios.yml
+      parameters:
+        pathToSrc: ${{ parameters.pathToSrc }}
+        projectName: ${{ parameters.projectName }}
+        iosCertificateFile: ${{ parameters.iosCertificateFile }}
+        iosCertificatePassword: ${{ parameters.iosCertificatePassword }}
+        iosProvisioningProfileFile: ${{ parameters.iosProvisioningProfileFile }}
+        iosExportOptionsFile: ${{ parameters.iosExportOptionsFile }}
+        BannerVersionNameText: ${{ parameters.BannerVersionNameText }}
+        firebaseJsonFile: '${{ parameters.firebaseJsonFile }}'
+        firebaseOptionsDartFile: '${{ parameters.firebaseOptionsDartFile }}'
+        googleServicesJsonFile: '${{ parameters.googleServicesJsonFile }}'

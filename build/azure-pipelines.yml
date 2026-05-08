@@ -1,0 +1,145 @@
+# Use this to schedule a build at defined days and times.
+# schedules:
+# - cron: "30 08 * * Mon-Fri" # Format is "Minutes Hours DayOfMonth Month DayOfWeek" in UTC (that's why 08 is 3h EST)
+#   displayName: 'Nightly weekdays build - 3:30 EST'
+#   always: false # If nothing changed, don't start a new run.
+#   branches:
+#     include:
+#       - main
+#       - develop
+#       - release/*
+#       - feature/*
+
+pr:
+ branches:
+   include:
+   - main
+   - release/*
+   - feature/*
+
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+
+- template: variables.yml
+
+stages:
+- stage: Commit_Validation
+  dependsOn: []
+  jobs:
+    - template: stage-commit-validation.yaml
+    
+
+
+- stage: Build_Staging
+  dependsOn: Commit_Validation
+  jobs:
+  - template: stage-build.yml
+    parameters:
+      applicationEnvironment: Staging
+      androidKeyStoreFile: $(InternalKeystore)
+      androidKeyPropertiesFile: $(InternalKeyProperties)
+      androidVariableGroup: 'FlutterApplicationTemplate.Distribution.Internal.Android'
+      iosProvisioningProfileFile: $(InternalProvisioningProfile)
+      iosExportOptionsFile: $(InternalExportOptions)
+      iosCertificateFile: $(InternalCertificate)
+      iosVariableGroup: 'FlutterApplicationTemplate.Distribution.Internal.iOS'
+      BannerVersionNameText: 'STAGING'
+      firebaseJsonFile:  $(InternalFirebaseJson)
+      firebaseOptionsDartFile:  $(InternalFirebaseOptionsDart)
+      googleServicesJsonFile:  $(InternalGoogleServicesJson)
+      bugseeVariableGroup: 'FlutterApplicationTemplate.Bugsee.Tokens'
+      androidArtifactFormat: 'apk'
+
+- stage: FirebaseDistribution_TestFlight_Staging
+  condition: and(succeeded(), eq(variables['IsPullRequestBuild'], 'false'))
+  dependsOn: Build_Staging
+  jobs:
+  - template: stage-release-firebase-app-distribution.yml
+    parameters:
+      applicationEnvironment: Staging
+      deploymentEnvironment: Firebase App Distribution
+      androidVariableGroup: 'FlutterApplicationTemplate.Distribution.Internal.Android'
+      firebaseAppDistributionJson: $(FirebaseAppDistributionJson)
+      artifactFileName: 'app-release.apk'
+
+  - template: stage-release-appstore.yml
+    parameters:
+      applicationEnvironment: Staging
+      deploymentEnvironment: TestFlight
+      iosVariableGroup: 'FlutterApplicationTemplate.Distribution.Internal.iOS'
+      ServiceConnection: $(InternalServiceConnection)
+
+# MOBSF SECURITY SCAN STAGING
+- stage: Security_Scan_Build_Staging
+  dependsOn: Build_Staging
+  jobs:
+  - template: stage-security-scan.yml
+    parameters:
+      applicationEnvironment: Staging
+      enableIosSecurityScan: true
+      enableAndroidSecurityScan: true
+
+- stage: Build_Production
+  dependsOn: Build_Staging
+  condition: and(succeeded(), eq(variables['IsPullRequestBuild'], 'false'))
+  jobs:
+  - template: stage-build.yml
+    parameters:
+      applicationEnvironment: Production
+      androidKeyStoreFile: $(GooglePlayKeystore)
+      androidKeyPropertiesFile: $(GooglePlayKeyProperties)
+      androidVariableGroup: 'FlutterApplicationTemplate.Distribution.GooglePlay'
+      iosProvisioningProfileFile: $(AppStoreProvisioningProfile)
+      iosExportOptionsFile: $(AppStoreExportOptions)
+      iosCertificateFile: $(AppStoreCertificate)
+      iosVariableGroup: 'FlutterApplicationTemplate.Distribution.AppStore'
+      firebaseJsonFile:  $(FirebaseJson)
+      firebaseOptionsDartFile:  $(FirebaseOptionsDart)
+      googleServicesJsonFile:  $(GoogleServicesJson)
+      androidArtifactFormat: 'apk'
+
+- stage: FirebaseDistribution_Production
+  condition: and(succeeded(), eq(variables['IsPullRequestBuild'], 'false'))
+  dependsOn: Build_Production
+  jobs:
+  - template: stage-release-firebase-app-distribution.yml
+    parameters:
+      applicationEnvironment: Production
+      deploymentEnvironment: Firebase App Distribution
+      androidVariableGroup: 'FlutterApplicationTemplate.Distribution.GooglePlay'
+      firebaseAppDistributionJson: $(FirebaseAppDistributionJson)
+      artifactFileName: 'app-release.apk'
+
+# MOBSF SECURITY SCAN PRODUCTION
+- stage: Security_Scan_Build_Production
+  dependsOn: Build_Production
+  jobs:
+  - template: stage-security-scan.yml
+    parameters:
+      applicationEnvironment: Production
+      enableIosSecurityScan: true
+      enableAndroidSecurityScan: true
+
+- stage: AppStore
+  condition: and(succeeded(), eq(variables['IsPullRequestBuild'], 'false'))
+  dependsOn: Build_Production
+  jobs:
+  - template: stage-release-appstore.yml
+    parameters:
+      applicationEnvironment: Production
+      deploymentEnvironment: AppStore
+      iosVariableGroup: 'FlutterApplicationTemplate.Distribution.AppStore'
+      ServiceConnection: $(AppStoreServiceConnection)
+
+- stage: GooglePlay
+  condition: and(succeeded(), eq(variables['IsPullRequestBuild'], 'false'))
+  dependsOn: Build_Production
+  jobs:
+  - template: stage-release-googleplay.yml
+    parameters:
+      applicationEnvironment: Production
+      deploymentEnvironment: GooglePlay

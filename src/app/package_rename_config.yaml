@@ -1,0 +1,64 @@
+# Default package rename configuration file for the application.
+package_rename_config:
+  android:
+    app_name: EssenceApp
+    package_name: com.example.essenceApp
+    override_old_package: com.example.essenceApp
+
+  ios:
+    app_name: EssenceApp
+    bundle_name: EssenceApp
+    package_name: com.example.essenceApp
+
+  linux:
+    app_name: EssenceApp
+    package_name: com.example.essenceApp
+    exe_name: EssenceApp
+
+  macos:
+    app_name: EssenceApp
+    package_name: com.example.essenceApp
+    copyright_notice: Copyright © 2024 nventive. All rights reserved. # (String) The product copyright of the macos app.
+
+  web:
+    app_name: EssenceApp
+    description: Application Template for Flutter # (String) The description of the web app and PWA.
+
+  windows:
+    app_name: EssenceApp
+    organization: EssenceApp
+    copyright_notice: Copyright © 2024 nventive. All rights reserved. # (String) The legal copyright of the windows app.
+    exe_name: EssenceApp
+
+# Production package rename configuration file for the application.
+# Useful for the production environment when built from the CI.
+package_rename_config-Production:
+  android:
+    app_name: EssenceApp
+    package_name: com.example.essenceApp
+    override_old_package: com.example.essenceApp
+
+  ios:
+    app_name: EssenceApp
+    bundle_name: EssenceApp
+    package_name: com.example.essenceApp
+
+  linux:
+    app_name: EssenceApp
+    package_name: com.example.essenceApp
+    exe_name: EssenceApp
+
+  macos:
+    app_name: EssenceApp
+    package_name: com.example.essenceApp
+    copyright_notice: Copyright © 2024 nventive. All rights reserved. # (String) The product copyright of the macos app.
+
+  web:
+    app_name: EssenceApp
+    description: Application Template for Flutter # (String) The description of the web app and PWA.
+
+  windows:
+    app_name: EssenceApp
+    organization: EssenceApp
+    copyright_notice: Copyright © 2024 nventive. All rights reserved. # (String) The legal copyright of the windows app.
+    exe_name: EssenceApp

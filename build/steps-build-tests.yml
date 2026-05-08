@@ -1,0 +1,59 @@
+parameters:
+- name: pathToSrc
+  type: string
+  default: '$(Build.SourcesDirectory)/src'
+- name: projectName
+  type: string
+  default: ''
+- name: applicationEnvironment
+  type: string
+  default: ''
+
+steps:
+- template: templates/flutter-install.yml
+
+
+
+- template: templates/flutter-prepare.yml
+  parameters:
+    projectDirectory: '${{ parameters.pathToSrc }}/app'
+
+- task: FlutterTest@0
+  displayName: "Run Tests"
+  inputs:
+    generateCodeCoverageReport: true
+    projectDirectory: '${{ parameters.pathToSrc }}/app'
+
+# TODO #316303 : Disable integration tests for now, will be fixed and re-enabled in the future.
+# - task: FlutterCommand@0
+#   displayName: "Run Integration Tests"
+#   inputs:
+#     projectDirectory: '${{ parameters.pathToSrc }}/app'
+#     arguments: test integration_test/integration_test.dart --dart-define ENV=${{ parameters.applicationEnvironment }} -d all
+
+- template: templates/flutter-diagnostics.yml
+  parameters:
+    projectDirectory: '${{ parameters.pathToSrc }}/app'
+    condition: failed()
+
+- script: |
+    set PATH=%PATH%;C:\Users\VssAdministrator\AppData\Local\Pub\Cache\bin
+    dart pub global activate cobertura
+    cd ${{ parameters.pathToSrc }}/app
+    cobertura convert
+  displayName: Convert Code Coverage from LCOV to Cobertura
+
+- task: PublishCodeCoverageResults@2
+  displayName: Publish Code Coverage Result
+  condition: succeeded()
+  inputs:
+    summaryFileLocation: "${{ parameters.pathToSrc }}/app/coverage/cobertura.xml"
+
+- publish: $(Build.ArtifactStagingDirectory)
+  displayName: 'Publish Artifact'
+  condition: always()
+  artifact: $(ArtifactName)
+
+- task: PostBuildCleanup@4
+  displayName: 'Post-Build cleanup: Cleanup files to keep build server clean!'
+  condition: always()

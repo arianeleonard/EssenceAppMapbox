@@ -1,0 +1,111 @@
+parameters:
+- name: androidKeystoreFile
+  type: string
+- name: androidKeyStorePropertiesFile
+  type: string
+- name: pathToSrc
+  type: string
+- name: projectName
+  type: string
+  default: '$(ProjectName)'
+- name: firebaseJsonFile
+  type: string
+- name: firebaseOptionsDartFile
+  type: string
+- name: googleServicesJsonFile
+  type: string
+- name: artifactTargetFormat
+  type: string
+
+steps:
+
+
+- template: templates/gitversion.yml
+- template: templates/build-number.yml
+
+- task: JavaToolInstaller@0
+  displayName: "Install Java SDK 17"
+  inputs:
+    versionSpec: '17'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
+
+- template: templates/flutter-install.yml
+
+- template : templates/replace-firebase-config.yml
+  parameters:
+    pathToSrc: '${{ parameters.pathToSrc }}'
+    firebaseJsonFile: '${{ parameters.firebaseJsonFile }}'
+    firebaseOptionsDartFile: '${{ parameters.firebaseOptionsDartFile }}'
+    googleServicesJsonFile: '${{ parameters.googleServicesJsonFile }}'
+
+- task: DownloadSecureFile@1
+  name: keyStore
+  displayName: "Download Keystore from Secure Files"
+  inputs:
+    secureFile: ${{ parameters.androidKeystoreFile }}
+
+# Flutter project signing process goes through 'key.properties' file which holds secure information about the keystore.
+- task: DownloadSecureFile@1
+  name: keyProperties
+  displayName: "Download Key Properties from Secure Files"
+  inputs:
+    secureFile: ${{ parameters.androidKeyStorePropertiesFile }}
+
+# The file copied inside the source directory must be aligned with the name chosen in '/src/app/lib/android/app/build.gradle' where 'key.properties' is loaded.
+- task: PowerShell@2
+  displayName: Copy Signing Configuration Files
+  inputs:
+    targetType: 'inline'
+    script: |
+      Copy-Item -Path '$(keyProperties.secureFilePath)' -Destination '${{ parameters.pathToSrc }}\app\android\key.properties'
+      Write-Host 'Key properties copied to ${{ parameters.pathToSrc }}/app/android/key.properties.'
+
+      Copy-Item -Path '$(keyStore.secureFilePath)' -Destination '${{ parameters.pathToSrc }}\app\android\app\${{ parameters.androidKeystoreFile }}'
+      Write-Host 'Key store copied to ${{ parameters.pathToSrc }}/app/android/app/${{ parameters.androidKeystoreFile }}.'
+
+- template: templates/flutter-prepare.yml
+  parameters:
+    projectDirectory: '${{ parameters.pathToSrc }}/app'
+
+- task: PowerShell@2
+  displayName: 'Execute Package Rename'
+  condition: eq(variables['ApplicationEnvironment'], 'Production')
+  inputs:
+    targetType: 'inline'
+    script: |
+      Set-Location '${{ parameters.pathToSrc }}/app'
+      dart run package_rename -f Production
+
+- task: FlutterBuild@0
+  displayName: Build Project for Release
+  inputs:
+    target: '${{ parameters.artifactTargetFormat }}'
+    buildName: '$(MajorMinorPatch)'
+    buildNumber: '$(PreReleaseNumber)'
+    debugMode: false
+    profileMode: false
+    projectDirectory: '${{ parameters.pathToSrc }}/app'
+    verboseMode: true
+    dartDefineMulti: ENV=$(applicationEnvironment) BUGSEE_TOKEN=$(AndroidBugseeToken)
+
+- template: templates/flutter-diagnostics.yml
+  parameters:
+    projectDirectory: '${{ parameters.pathToSrc }}/app'
+    condition: failed()
+
+- task: CopyFiles@2
+  displayName: 'Copy Binary Files'
+  inputs:
+    contents: '**/app-release.${{ parameters.artifactTargetFormat }}'
+    flattenFolders : true
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+- publish: $(Build.ArtifactStagingDirectory)
+  displayName: 'Publish Artifact'
+  condition: always()
+  artifact: $(ArtifactName)
+
+- task: PostBuildCleanup@4
+  displayName: 'Post-Build Cleanup: Cleanup files to keep build server clean!'
+  condition: always()
