@@ -8,7 +8,7 @@
 PRODUCT_NAME = EssenceApp
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.essenceApp
+PRODUCT_BUNDLE_IDENTIFIER = com.nventive.essenceAppMapbox
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2024 nventive. All rights reserved.

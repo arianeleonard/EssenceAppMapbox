@@ -1,4 +1,4 @@
-package com.example.essenceApp
+package com.nventive.essenceAppMapbox
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -68,6 +68,8 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your location is used to centre the map on where you are.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Your location is used continuously so the map can stay centred on you and show relevant nearby content even when the app is in the background.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<!--

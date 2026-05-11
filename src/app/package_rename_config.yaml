@@ -2,22 +2,22 @@
 package_rename_config:
   android:
     app_name: EssenceApp
-    package_name: com.example.essenceApp
-    override_old_package: com.example.essenceApp
+    package_name: com.nventive.essenceAppMapbox
+    override_old_package: com.nventive.essenceAppMapbox
 
   ios:
     app_name: EssenceApp
     bundle_name: EssenceApp
-    package_name: com.example.essenceApp
+    package_name: com.nventive.essenceAppMapbox
 
   linux:
     app_name: EssenceApp
-    package_name: com.example.essenceApp
+    package_name: com.nventive.essenceAppMapbox
     exe_name: EssenceApp
 
   macos:
     app_name: EssenceApp
-    package_name: com.example.essenceApp
+    package_name: com.nventive.essenceAppMapbox
     copyright_notice: Copyright © 2024 nventive. All rights reserved. # (String) The product copyright of the macos app.
 
   web:
@@ -35,22 +35,22 @@ package_rename_config:
 package_rename_config-Production:
   android:
     app_name: EssenceApp
-    package_name: com.example.essenceApp
-    override_old_package: com.example.essenceApp
+    package_name: com.nventive.essenceAppMapbox
+    override_old_package: com.nventive.essenceAppMapbox
 
   ios:
     app_name: EssenceApp
     bundle_name: EssenceApp
-    package_name: com.example.essenceApp
+    package_name: com.nventive.essenceAppMapbox
 
   linux:
     app_name: EssenceApp
-    package_name: com.example.essenceApp
+    package_name: com.nventive.essenceAppMapbox
     exe_name: EssenceApp
 
   macos:
     app_name: EssenceApp
-    package_name: com.example.essenceApp
+    package_name: com.nventive.essenceAppMapbox
     copyright_notice: Copyright © 2024 nventive. All rights reserved. # (String) The product copyright of the macos app.
 
   web:

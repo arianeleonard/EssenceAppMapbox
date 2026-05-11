@@ -32,7 +32,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.essenceApp"
+    namespace = "com.nventive.essenceAppMapbox"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -51,7 +51,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.essenceApp"
+        applicationId = "com.nventive.essenceAppMapbox"
         minSdkVersion 31
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()

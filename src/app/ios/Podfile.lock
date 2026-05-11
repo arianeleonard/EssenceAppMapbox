@@ -3,88 +3,91 @@ PODS:
   - bugsee_flutter (8.6.9):
     - Bugsee (= 5.5.9)
     - Flutter
-  - Firebase/CoreOnly (12.6.0):
-    - FirebaseCore (~> 12.6.0)
-  - Firebase/RemoteConfig (12.6.0):
+  - Firebase/CoreOnly (12.12.0):
+    - FirebaseCore (~> 12.12.0)
+  - Firebase/RemoteConfig (12.12.0):
     - Firebase/CoreOnly
-    - FirebaseRemoteConfig (~> 12.6.0)
-  - firebase_analytics (12.1.0):
+    - FirebaseRemoteConfig (~> 12.12.0)
+  - firebase_analytics (12.3.0):
     - firebase_core
-    - FirebaseAnalytics (= 12.6.0)
+    - FirebaseAnalytics (= 12.12.0)
     - Flutter
-  - firebase_core (4.3.0):
-    - Firebase/CoreOnly (= 12.6.0)
+  - firebase_core (4.7.0):
+    - Firebase/CoreOnly (= 12.12.0)
     - Flutter
-  - firebase_remote_config (6.1.3):
-    - Firebase/RemoteConfig (= 12.6.0)
+  - firebase_remote_config (6.4.0):
+    - Firebase/RemoteConfig (= 12.12.0)
     - firebase_core
     - Flutter
-  - FirebaseABTesting (12.6.0):
-    - FirebaseCore (~> 12.6.0)
-  - FirebaseAnalytics (12.6.0):
-    - FirebaseAnalytics/Default (= 12.6.0)
-    - FirebaseCore (~> 12.6.0)
-    - FirebaseInstallations (~> 12.6.0)
+  - FirebaseABTesting (12.12.0):
+    - FirebaseCore (~> 12.12.0)
+  - FirebaseAnalytics (12.12.0):
+    - FirebaseAnalytics/Default (= 12.12.0)
+    - FirebaseCore (~> 12.12.0)
+    - FirebaseInstallations (~> 12.12.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
     - GoogleUtilities/MethodSwizzler (~> 8.1)
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
-  - FirebaseAnalytics/Default (12.6.0):
-    - FirebaseCore (~> 12.6.0)
-    - FirebaseInstallations (~> 12.6.0)
-    - GoogleAppMeasurement/Default (= 12.6.0)
+  - FirebaseAnalytics/Default (12.12.0):
+    - FirebaseCore (~> 12.12.0)
+    - FirebaseInstallations (~> 12.12.0)
+    - GoogleAppMeasurement/Default (= 12.12.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
     - GoogleUtilities/MethodSwizzler (~> 8.1)
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
-  - FirebaseCore (12.6.0):
-    - FirebaseCoreInternal (~> 12.6.0)
+  - FirebaseCore (12.12.1):
+    - FirebaseCoreInternal (~> 12.12.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/Logger (~> 8.1)
-  - FirebaseCoreInternal (12.6.0):
+  - FirebaseCoreInternal (12.12.0):
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
-  - FirebaseInstallations (12.6.0):
-    - FirebaseCore (~> 12.6.0)
+  - FirebaseInstallations (12.12.0):
+    - FirebaseCore (~> 12.12.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/UserDefaults (~> 8.1)
     - PromisesObjC (~> 2.4)
-  - FirebaseRemoteConfig (12.6.0):
-    - FirebaseABTesting (~> 12.6.0)
-    - FirebaseCore (~> 12.6.0)
-    - FirebaseInstallations (~> 12.6.0)
-    - FirebaseRemoteConfigInterop (~> 12.6.0)
-    - FirebaseSharedSwift (~> 12.6.0)
+  - FirebaseRemoteConfig (12.12.0):
+    - FirebaseABTesting (~> 12.12.0)
+    - FirebaseCore (~> 12.12.0)
+    - FirebaseInstallations (~> 12.12.0)
+    - FirebaseRemoteConfigInterop (~> 12.12.0)
+    - FirebaseSharedSwift (~> 12.12.0)
     - GoogleUtilities/Environment (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
-  - FirebaseRemoteConfigInterop (12.6.0)
-  - FirebaseSharedSwift (12.6.0)
+  - FirebaseRemoteConfigInterop (12.12.0)
+  - FirebaseSharedSwift (12.12.0)
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
-  - GoogleAdsOnDeviceConversion (3.2.0):
+  - geolocator_apple (1.2.0):
+    - Flutter
+    - FlutterMacOS
+  - GoogleAdsOnDeviceConversion (3.4.2):
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/Logger (~> 8.1)
     - GoogleUtilities/Network (~> 8.1)
     - nanopb (~> 3.30910.0)
-  - GoogleAppMeasurement/Core (12.6.0):
+  - GoogleAppMeasurement/Core (12.12.0):
     - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
     - GoogleUtilities/MethodSwizzler (~> 8.1)
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
-  - GoogleAppMeasurement/Default (12.6.0):
-    - GoogleAdsOnDeviceConversion (~> 3.2.0)
-    - GoogleAppMeasurement/Core (= 12.6.0)
-    - GoogleAppMeasurement/IdentitySupport (= 12.6.0)
+  - GoogleAppMeasurement/Default (12.12.0):
+    - GoogleAdsOnDeviceConversion (~> 3.4.0)
+    - GoogleAppMeasurement/Core (= 12.12.0)
+    - GoogleAppMeasurement/IdentitySupport (= 12.12.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
     - GoogleUtilities/MethodSwizzler (~> 8.1)
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
-  - GoogleAppMeasurement/IdentitySupport (12.6.0):
-    - GoogleAppMeasurement/Core (= 12.6.0)
+  - GoogleAppMeasurement/IdentitySupport (12.12.0):
+    - GoogleAppMeasurement/Core (= 12.12.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
     - GoogleUtilities/MethodSwizzler (~> 8.1)
     - GoogleUtilities/Network (~> 8.1)
@@ -119,6 +122,18 @@ PODS:
     - GoogleUtilities/Privacy
   - integration_test (0.0.1):
     - Flutter
+  - mapbox_maps_flutter (2.23.0):
+    - Flutter
+    - MapboxMaps (= 11.23.0)
+    - Turf (= 4.0.0)
+  - MapboxCommon (24.23.0):
+    - Turf (= 4.0.0)
+  - MapboxCoreMaps (11.23.0):
+    - MapboxCommon (= 24.23.0)
+  - MapboxMaps (11.23.0):
+    - MapboxCommon (= 24.23.0)
+    - MapboxCoreMaps (= 11.23.0)
+    - Turf (= 4.0.0)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
     - nanopb/encode (= 3.30910.0)
@@ -128,9 +143,6 @@ PODS:
     - Flutter
   - package_info_plus (0.4.5):
     - Flutter
-  - path_provider_foundation (0.0.1):
-    - Flutter
-    - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
@@ -141,6 +153,7 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - Turf (4.0.0)
   - url_launcher_ios (0.0.1):
     - Flutter
 
@@ -151,10 +164,11 @@ DEPENDENCIES:
   - firebase_remote_config (from `.symlinks/plugins/firebase_remote_config/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - mapbox_maps_flutter (from `.symlinks/plugins/mapbox_maps_flutter/ios`)
   - open_filex (from `.symlinks/plugins/open_filex/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
-  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
@@ -176,8 +190,12 @@ SPEC REPOS:
     - GoogleAdsOnDeviceConversion
     - GoogleAppMeasurement
     - GoogleUtilities
+    - MapboxCommon
+    - MapboxCoreMaps
+    - MapboxMaps
     - nanopb
     - PromisesObjC
+    - Turf
 
 EXTERNAL SOURCES:
   bugsee_flutter:
@@ -192,14 +210,16 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  geolocator_apple:
+    :path: ".symlinks/plugins/geolocator_apple/darwin"
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
+  mapbox_maps_flutter:
+    :path: ".symlinks/plugins/mapbox_maps_flutter/ios"
   open_filex:
     :path: ".symlinks/plugins/open_filex/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
-  path_provider_foundation:
-    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   sensors_plus:
@@ -214,35 +234,40 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Bugsee: 308fd4cddc4f518c68b4aa6320099edef68fe2f7
   bugsee_flutter: 7700b787ad3e98dcae5c4666f2441da847d00277
-  Firebase: a451a7b61536298fd5cbfe3a746fd40443a50679
-  firebase_analytics: 4f9cca09e65f6c2944a862c6dc86f6bed9fb769c
-  firebase_core: ba00a168e719694f38960502ceb560285603d073
-  firebase_remote_config: 4315c34bfba52eb501b69cfa84d519f340385a37
-  FirebaseABTesting: 119f0a2b2e68b1ae05d248c5adb2455f148f20c1
-  FirebaseAnalytics: d0a97a0db6425e5a5d966340b87f92ca7b13a557
-  FirebaseCore: 0e38ad5d62d980a47a64b8e9301ffa311457be04
-  FirebaseCoreInternal: 69bf1306a05b8ac43004f6cc1f804bb7b05b229e
-  FirebaseInstallations: 631b38da2e11a83daa4bfb482f79d286a5dfa7ad
-  FirebaseRemoteConfig: c5dfe22828a7ae7673d16224ea92743687e993df
-  FirebaseRemoteConfigInterop: 3443b8cb8fffd76bb3e03b2a84bfd3db952fcda4
-  FirebaseSharedSwift: 79f27fff0addd15c3de19b87fba426f3cc2c964f
+  Firebase: aa154fee4e9b8eac17aa42344988865b3e857d33
+  firebase_analytics: e5f4faccf1f7040d3788e835b7eb7b57dc84a911
+  firebase_core: 9156a152117c843440b0b990c785aa0259bc5447
+  firebase_remote_config: 924bae350163e03e7e5a3a40733addb9a8e1e42b
+  FirebaseABTesting: c21a401a23c2eaa6f520d19febcd4911312b545f
+  FirebaseAnalytics: db0dca7e35a503ddf6869e457f4926dc35afe216
+  FirebaseCore: 86241206e656f5c80c995e370e6c975913b9b284
+  FirebaseCoreInternal: 7c12fc3011d889085e765e317d7b9fd1cef97af9
+  FirebaseInstallations: 4e6e162aa4abaaeeeb01dd00179dfc5ad9c2194e
+  FirebaseRemoteConfig: 6ab95b4ee5fd4a94d09a704d88f5341db5713250
+  FirebaseRemoteConfigInterop: 23996ab7397494722df4fdd1fd398024389d5da8
+  FirebaseSharedSwift: bccaff90721d14bafc14be34f28b77fdd7c91dc9
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_local_notifications: a5a732f069baa862e728d839dd2ebb904737effb
-  GoogleAdsOnDeviceConversion: d68c69dd9581a0f5da02617b6f377e5be483970f
-  GoogleAppMeasurement: 3bf40aff49a601af5da1c3345702fcb4991d35ee
+  geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
+  GoogleAdsOnDeviceConversion: 02fc8fe599acd867e328321effb0d9b2d023a38a
+  GoogleAppMeasurement: 3b4687de50ab25ee2d4d541849f10ca8df862a12
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  mapbox_maps_flutter: e621533614172933bc7c2dc42ad67aa201094b5a
+  MapboxCommon: 718cadedc92a08d5e2858c4926cfef7cacdfd329
+  MapboxCoreMaps: 3eab31f7dc4ae7fda28377e299af186f87ad0612
+  MapboxMaps: f1f11ac17b46b797c6f021879eac13cc6d2cbaa4
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   open_filex: 432f3cd11432da3e39f47fcc0df2b1603854eff1
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
-  path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   sensors_plus: 6a11ed0c2e1d0bd0b20b4029d3bad27d96e0c65b
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
+  Turf: c9eb11a65d96af58cac523460fd40fec5061b081
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
 
-PODFILE CHECKSUM: 5e773f411663c695e26c43c3e3c6ff68e3f631da
+PODFILE CHECKSUM: f626a775f15758c0f646cb034c6fb84e44713172
 
 COCOAPODS: 1.16.2
