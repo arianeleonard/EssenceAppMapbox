@@ -71,33 +71,45 @@ final class _LoggerManager implements LoggerManager {
   _LoggerManager({
     required LoggerRepository loggerRepository,
     required Alice alice,
-  })  : _loggerRepository = loggerRepository,
-        _alice = alice;
+  }) : _loggerRepository = loggerRepository,
+       _alice = alice;
 
   @override
   Future<Logger> createLogInstance() async {
     final List<LogOutput> loggerOutputs = [];
 
-    final loggingConfiguration =
-        await _loggerRepository.getLoggingConfiguration();
+    final loggingConfiguration = await _loggerRepository
+        .getLoggingConfiguration();
 
     _initialIsConsoleLoggingEnabled =
         loggingConfiguration.isConsoleLoggingEnabled ??
-            bool.parse(dotenv.env["IS_CONSOLE_LOGGING_ENABLED"] ?? 'false');
+        bool.parse(dotenv.env["IS_CONSOLE_LOGGING_ENABLED"] ?? 'false');
     if (_initialIsConsoleLoggingEnabled) {
       loggerOutputs.add(CustomConsoleOutput());
       loggerOutputs.add(AliceOutput(alice: _alice));
     }
     isConsoleLoggingEnabled = _initialIsConsoleLoggingEnabled;
 
-    _initialIsFileLoggingEnabled = loggingConfiguration.isFileLoggingEnabled ??
+    _initialIsFileLoggingEnabled =
+        loggingConfiguration.isFileLoggingEnabled ??
         bool.parse(dotenv.env["IS_FILE_LOGGING_ENABLED"] ?? 'false');
     if (_initialIsFileLoggingEnabled) {
-      // Initialize the log file.
-      final Directory appDocumentsDir =
-          await getApplicationDocumentsDirectory();
-      _logFile = File('${appDocumentsDir.path}/$_fileName');
-      loggerOutputs.add(CustomFileOutput(file: _logFile!));
+      try {
+        // Initialize the log file.
+        final Directory appDocumentsDir =
+            await getApplicationDocumentsDirectory();
+        _logFile = File('${appDocumentsDir.path}/$_fileName');
+        loggerOutputs.add(CustomFileOutput(file: _logFile!));
+      } catch (e, stackTrace) {
+        // If path_provider fails for any reason, continue without file logging
+        // so the app can still start.
+        _initialIsFileLoggingEnabled = false;
+        _logFile = null;
+        // ignore: avoid_print
+        print(
+          'Could not initialize file logging. Continuing without file logs. Error: $e',
+        );
+      }
     }
     isFileLoggingEnabled = _initialIsFileLoggingEnabled;
 
@@ -151,13 +163,13 @@ final class _LoggerManager implements LoggerManager {
       try {
         _logger.t("Log file exists. It's time to share it.");
 
-        var result = await Share.shareXFiles(
-          [XFile(_logFile!.path)],
-          subject: "Diagnostics - ApplicationTemplate ${DateTime.now()}",
-        );
+        var result = await Share.shareXFiles([
+          XFile(_logFile!.path),
+        ], subject: "Diagnostics - ApplicationTemplate ${DateTime.now()}");
 
         _logger.i(
-            "Share execution has been successful. It returned the following status ${result.status}.");
+          "Share execution has been successful. It returned the following status ${result.status}.",
+        );
 
         return result.status != ShareResultStatus.unavailable;
       } catch (e, stackTrace) {
